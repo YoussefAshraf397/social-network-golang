@@ -1,0 +1,18 @@
+
+
+POST {{local}}/api/users
+Content-Type: application/json
+
+{
+  "email" : "joe@joe.com",
+  "username"  : "youssef"
+}
+
+####
+
+POST {{local}}/api/login
+Content-Type: application/json
+
+{
+  "email" : "joe@joe.com"
+}
