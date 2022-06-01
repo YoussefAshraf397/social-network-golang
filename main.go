@@ -23,6 +23,7 @@ func main() {
 		return
 	}
 	defer db.Close()
+
 	if err = db.Ping(); err != nil {
 		log.Fatalln("cannot ping to database: %v/n", err)
 		return

@@ -1,28 +1,35 @@
 
-
+#### CREATE USER ENDPOINT
 POST {{local}}/api/users
 Content-Type: application/json
 
 {
-  "email" : "rr@ahsraf.com",
-  "username"  : "rr"
+  "email" : "qq@ahsraf.com",
+  "username"  : "qq"
 }
 
-###
 
+#### LOGIN USER ENDPOINT
 POST {{local}}/api/login
 Content-Type: application/json
 
 {
-  "email" : "youssef@youssef.com"
+  "email" : "rr@ahsraf.com"
 }
 
-###
 
+#### GET AUTH USER ENDPOINT
 GET {{local}}/api/auth_user
 Authorization: {{user-token}}
 
-###
 
-POST {{local}}/api/users/rr/toggle_follow
+
+#### TOGGLE FOLLOW ENDPOINT
+POST {{local}}/api/users/qq/toggle_follow
+Authorization: {{user-token}}
+
+
+
+#### GET USER PROFILE ENDPOINT
+GET {{local}}/api/users/qq
 Authorization: {{user-token}}
