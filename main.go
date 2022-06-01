@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	databaseUrl = "postgresql://root@127.0.0.1:26257/nakama?sslmode=disable"
+	databaseUrl = "postgresql://root@127.0.0.1:26257/socialnetwork?sslmode=disable"
 	port        = 3000
 )
 

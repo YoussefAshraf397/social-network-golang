@@ -4,8 +4,8 @@ POST {{local}}/api/users
 Content-Type: application/json
 
 {
-  "email" : "joe@joe.com",
-  "username"  : "youssef"
+  "email" : "rr@ahsraf.com",
+  "username"  : "rr"
 }
 
 ###
@@ -14,10 +14,15 @@ POST {{local}}/api/login
 Content-Type: application/json
 
 {
-  "email" : "joe@joe.com"
+  "email" : "youssef@youssef.com"
 }
 
 ###
 
 GET {{local}}/api/auth_user
+Authorization: {{user-token}}
+
+###
+
+POST {{local}}/api/users/rr/toggle_follow
 Authorization: {{user-token}}
