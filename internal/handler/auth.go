@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"social-network/internal/service"
+	"strings"
 )
 
 type loginInput struct {
@@ -35,4 +37,42 @@ func (h *handler) login(w http.ResponseWriter, r *http.Request) {
 	}
 	respond(w, out, http.StatusOK)
 
+}
+
+func (h *handler) authUser(w http.ResponseWriter, r *http.Request) {
+	u, err := h.AuthUser(r.Context())
+	if err == service.ErrUnauthenticated {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+	if err == service.ErrUserNotFound {
+		http.Error(w, err.Error(), http.StatusNotFound)
+	}
+	if err != nil {
+		respondError(w, err)
+		return
+	}
+
+	respond(w, u, http.StatusOK)
+}
+
+func (h *handler) withAuth(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		a := r.Header.Get("Authorization")
+		if !strings.HasPrefix(a, "Bearer") {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		token := a[7:]
+		uid, err := h.AuthUserId(token)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+
+		ctx := r.Context()
+		ctx = context.WithValue(ctx, service.KeyAuthUserId, uid)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
 }

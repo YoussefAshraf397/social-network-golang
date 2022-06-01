@@ -29,6 +29,7 @@ func main() {
 	}
 
 	codec := branca.NewBranca("supersecretkeyyoushouldnotcommit")
+	codec.SetTTL(uint32(service.TokenLifeSpan.Seconds()))
 	s := service.New(db, codec)
 	h := handler.New(s)
 

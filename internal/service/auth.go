@@ -5,6 +5,7 @@ package service
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -12,14 +13,34 @@ import (
 )
 
 const (
-	TokenLifeSpan = time.Hour * 24 * 14
+	TokenLifeSpan     = time.Hour * 24 * 14
+	KeyAuthUserId key = "auth_user_id"
 )
+
+type key string
 
 //Login output response
 type LoginOutput struct {
 	Token     string    `json:"token"`
 	ExpiresAt time.Time `json:"expiresAt"`
 	AuthUser  User      `json:"authUser"`
+}
+
+var (
+	ErrUnauthenticated = errors.New("unauthenticated")
+)
+
+// Auth user id from token
+func (s *Service) AuthUserId(token string) (int64, error) {
+	str, err := s.codec.DecodeToString(token)
+	if err != nil {
+		return 0, fmt.Errorf("could not decode token: %v", err)
+	}
+	i, err := strconv.ParseInt(str, 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("could not parse userId from token: %v", err)
+	}
+	return i, nil
 }
 
 func (s *Service) Login(ctx context.Context, email string) (LoginOutput, error) {
@@ -50,4 +71,26 @@ func (s *Service) Login(ctx context.Context, email string) (LoginOutput, error) 
 	out.ExpiresAt = time.Now().Add(TokenLifeSpan)
 
 	return out, nil
+}
+
+//AuthUser from context
+func (s *Service) AuthUser(ctx context.Context) (User, error) {
+	var u User
+
+	uid, ok := ctx.Value(KeyAuthUserId).(int64)
+	if !ok {
+		return u, ErrUnauthenticated
+	}
+
+	query := "SELECT username FROM users WHERE id = $1"
+	err := s.db.QueryRowContext(ctx, query, uid).Scan(&u.Username)
+	if err == sql.ErrNoRows {
+		return u, ErrUserNotFound
+	}
+	if err != nil {
+		return u, fmt.Errorf("could not query select auth user: %v", err)
+	}
+
+	u.ID = uid
+	return u, nil
 }

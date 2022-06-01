@@ -8,7 +8,7 @@ Content-Type: application/json
   "username"  : "youssef"
 }
 
-####
+###
 
 POST {{local}}/api/login
 Content-Type: application/json
@@ -16,3 +16,8 @@ Content-Type: application/json
 {
   "email" : "joe@joe.com"
 }
+
+###
+
+GET {{local}}/api/auth_user
+Authorization: {{user-token}}
