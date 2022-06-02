@@ -33,3 +33,9 @@ Authorization: {{user-token}}
 #### GET USER PROFILE ENDPOINT
 GET {{local}}/api/users/qq
 Authorization: {{user-token}}
+
+
+
+#### GET ALL USERS WITH FILTERS username ENDPOINT
+GET {{local}}/api/users?search=&first=&after=
+Authorization: {{user-token}}

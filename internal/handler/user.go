@@ -5,6 +5,7 @@ import (
 	"github.com/matryer/way"
 	"net/http"
 	"social-network/internal/service"
+	"strconv"
 )
 
 type createUserInput struct {
@@ -86,4 +87,19 @@ func (h *handler) user(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	respond(w, u, http.StatusOK)
+}
+
+func (h *handler) users(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	search := q.Get("search")
+	first, _ := strconv.Atoi(q.Get("first"))
+	after := q.Get("after")
+
+	uu, err := h.Users(r.Context(), search, first, after)
+	if err != nil {
+		respondError(w, err)
+		return
+	}
+	respond(w, uu, http.StatusOK)
+
 }
