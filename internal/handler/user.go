@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/matryer/way"
 	"net/http"
 	"social-network/internal/service"
@@ -90,12 +91,55 @@ func (h *handler) user(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) users(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("gwa function users ???", r)
+
 	q := r.URL.Query()
 	search := q.Get("search")
 	first, _ := strconv.Atoi(q.Get("first"))
 	after := q.Get("after")
 
 	uu, err := h.Users(r.Context(), search, first, after)
+	if err != nil {
+		respondError(w, err)
+		return
+	}
+	respond(w, uu, http.StatusOK)
+
+}
+
+func (h *handler) followers(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("gwa el function ??")
+	ctx := r.Context()
+	q := r.URL.Query()
+	username := way.Param(ctx, "user_name")
+	first, _ := strconv.Atoi(q.Get("first"))
+	after := q.Get("after")
+
+	uu, err := h.Followers(ctx, username, first, after)
+	if err == service.ErrInvalidUsername {
+		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
+	if err != nil {
+		respondError(w, err)
+		return
+	}
+	respond(w, uu, http.StatusOK)
+
+}
+
+func (h *handler) followees(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	q := r.URL.Query()
+	username := way.Param(ctx, "username")
+	first, _ := strconv.Atoi(q.Get("first"))
+	after := q.Get("after")
+
+	uu, err := h.Followees(r.Context(), username, first, after)
+	if err == service.ErrInvalidUsername {
+		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
 	if err != nil {
 		respondError(w, err)
 		return

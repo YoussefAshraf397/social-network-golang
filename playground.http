@@ -4,8 +4,8 @@ POST {{local}}/api/users
 Content-Type: application/json
 
 {
-  "email" : "qq@ahsraf.com",
-  "username"  : "qq"
+  "email" : "test@ahsraf.com",
+  "username"  : "test"
 }
 
 
@@ -14,7 +14,7 @@ POST {{local}}/api/login
 Content-Type: application/json
 
 {
-  "email" : "rr@ahsraf.com"
+  "email" : "test@ahsraf.com"
 }
 
 
@@ -25,17 +25,29 @@ Authorization: {{user-token}}
 
 
 #### TOGGLE FOLLOW ENDPOINT
-POST {{local}}/api/users/qq/toggle_follow
+POST {{local}}/api/users/joejoe/toggle_follow
 Authorization: {{user-token}}
 
 
 
 #### GET USER PROFILE ENDPOINT
-GET {{local}}/api/users/qq
+GET {{local}}/api/users/joejoe
 Authorization: {{user-token}}
 
 
 
 #### GET ALL USERS WITH FILTERS username ENDPOINT
 GET {{local}}/api/users?search=&first=&after=
+Authorization: {{user-token}}
+
+
+
+#### GET Follower users ENDPOINT
+GET {{local}}/api/users/test/followers?first=&after=
+Authorization: {{user-token}}
+
+
+
+#### GET Followees users ENDPOINT
+GET {{local}}/api/users/rr/followees?first=&after=
 Authorization: {{user-token}}
