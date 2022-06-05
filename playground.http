@@ -14,7 +14,7 @@ POST {{local}}/api/login
 Content-Type: application/json
 
 {
-  "email" : "test@ahsraf.com"
+  "email" : "youssef@youssef.com"
 }
 
 
@@ -22,6 +22,14 @@ Content-Type: application/json
 GET {{local}}/api/auth_user
 Authorization: {{user-token}}
 
+
+
+#### PUT AVATAR FOR AUTH USER ENDPOINT
+PUT {{local}}/api/auth_user/avatar
+Authorization: {{user-token}}
+Content-Type: image/png
+
+< assets/test.png
 
 
 #### TOGGLE FOLLOW ENDPOINT

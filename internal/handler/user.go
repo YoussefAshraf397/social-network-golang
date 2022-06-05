@@ -149,3 +149,25 @@ func (h *handler) followees(w http.ResponseWriter, r *http.Request) {
 	respond(w, uu, http.StatusOK)
 
 }
+
+func (h *handler) updateavatar(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	r.Body = http.MaxBytesReader(w, r.Body, service.MaxAvatarBytes)
+	defer r.Body.Close()
+
+	avatarURL, err := h.UpdateAvatar(ctx, r.Body)
+	if err == service.ErrUnauthenticated {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+	if err == service.ErrUnsupportAvatarFormat {
+		http.Error(w, err.Error(), http.StatusUnsupportedMediaType)
+		return
+	}
+	if err != nil {
+		respondError(w, err)
+		return
+	}
+	fmt.Fprint(w, avatarURL)
+}

@@ -6,14 +6,16 @@ import (
 )
 
 type Service struct {
-	db    *sql.DB
-	codec *branca.Branca
+	db     *sql.DB
+	codec  *branca.Branca
+	origin string
 }
 
 // New service implementation
-func New(db *sql.DB, codec *branca.Branca) *Service {
+func New(db *sql.DB, codec *branca.Branca, origin string) *Service {
 	return &Service{
-		db:    db,
-		codec: codec,
+		db:     db,
+		codec:  codec,
+		origin: origin,
 	}
 }
