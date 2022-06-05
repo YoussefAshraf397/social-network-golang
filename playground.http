@@ -25,7 +25,7 @@ Authorization: {{user-token}}
 
 
 #### TOGGLE FOLLOW ENDPOINT
-POST {{local}}/api/users/joejoe/toggle_follow
+POST {{local}}/api/users/test/toggle_follow
 Authorization: {{user-token}}
 
 
@@ -43,11 +43,11 @@ Authorization: {{user-token}}
 
 
 #### GET Follower users ENDPOINT
-GET {{local}}/api/users/test/followers?first=&after=
+GET {{local}}/api/users/test/get_followers?first=&after=
 Authorization: {{user-token}}
 
 
 
 #### GET Followees users ENDPOINT
-GET {{local}}/api/users/rr/followees?first=&after=
+GET {{local}}/api/users/rr/get_followees?first=&after=
 Authorization: {{user-token}}

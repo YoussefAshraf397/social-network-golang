@@ -108,10 +108,10 @@ func (h *handler) users(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) followers(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("gwa el function ??")
+	fmt.Println("gwa el function followers ??")
 	ctx := r.Context()
 	q := r.URL.Query()
-	username := way.Param(ctx, "user_name")
+	username := way.Param(ctx, "username")
 	first, _ := strconv.Atoi(q.Get("first"))
 	after := q.Get("after")
 
@@ -129,6 +129,8 @@ func (h *handler) followers(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) followees(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("gwa function followees ???", r)
+
 	ctx := r.Context()
 	q := r.URL.Query()
 	username := way.Param(ctx, "username")
