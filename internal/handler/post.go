@@ -2,8 +2,10 @@ package handler
 
 import (
 	"encoding/json"
+	"github.com/matryer/way"
 	"net/http"
 	"social-network/internal/service"
+	"strconv"
 )
 
 type createPostInput struct {
@@ -33,4 +35,24 @@ func (h *handler) createpost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	respond(w, ti, http.StatusOK)
+}
+
+func (h *handler) togglePostLike(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	postID, _ := strconv.ParseInt(way.Param(ctx, "postID"), 10, 64)
+	out, err := h.TogglePostLike(ctx, postID)
+	if err == service.ErrUnauthenticated {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	if err == service.ErrPostNotFound {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+	if err != nil {
+		respondError(w, err)
+		return
+	}
+	respond(w, out, http.StatusOK)
 }

@@ -71,3 +71,9 @@ Content-Type: application/json
   "spoilerOf": "show name her",
   "nsfw": true
 }
+
+
+
+#### POST TOGGLE_LIKE POST BY ID ENDPOINT
+POST {{local}}/api/posts/1/toggle_like
+Authorization: {{user-token}}

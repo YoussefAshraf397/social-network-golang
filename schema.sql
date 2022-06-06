@@ -23,7 +23,8 @@ CREATE TABLE IF NOT EXISTS posts (
     user_id INT NOT NULL REFERENCES users ,
     content VARCHAR NOT NULL ,
     spoiler_of VARCHAR ,
-    nsfw BOOLEAN NOT NULL ,
+    nsfw BOOLEAN ,
+    likes_count INT NOT NULL DEFAULT 0 CHECK (likes_count >= 0),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -35,10 +36,24 @@ CREATE TABLE IF NOT EXISTS timeline (
     post_id INT NOT NULL REFERENCES posts
 );
 
+CREATE UNIQUE INDEX IF NOT EXISTS timeline_unique ON timeline (user_id, post_id) ;
 
-CREATE UNIQUE INDEX IF NOT EXISTS time_line_unique ON timeline (user_id, post_id);
 
+CREATE TABLE IF NOT EXISTS post_likes (
+    user_id INT NOT NULL REFERENCES users,
+    post_id INT NOT NULL REFERENCES posts,
+    PRIMARY KEY (user_id , post_id)
+);
 
 INSERT INTO users (id,email,username) VALUES
       (1,'youssef@youssef.com' , 'youssef'),
       (2 , 'mamdouh@mamdouh.com' , 'Ahmed');
+
+
+INSERT INTO posts (id,user_id,content) VALUES
+     (1,1,'This is firstpost of first user');
+
+INSERT INTO timeline (id,user_id,post_id) VALUES
+    (1,1,1);
+
+

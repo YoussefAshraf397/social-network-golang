@@ -21,6 +21,11 @@ func isUniqueViolation(err error) bool {
 	return ok && pgerror.Code == "23505"
 }
 
+func isForeignKeyViolation(err error) bool {
+	pgerror, ok := err.(pgx.PgError)
+	return ok && pgerror.Code == "23503"
+}
+
 func buildQuery(text string, data map[string]interface{}) (string, []interface{}, error) {
 
 	t, ok := queriesCache[text]
