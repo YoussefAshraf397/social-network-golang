@@ -67,13 +67,31 @@ Authorization: {{user-token}}
 Content-Type: application/json
 
 {
-  "content": "new post",
-  "spoilerOf": "show name her",
+  "content": "new postsdsdsdds",
+  "spoilerOf": "show name herdsdsdsds",
   "nsfw": true
 }
 
 
 
+#### GET ALL POSTS
+GET {{local}}/api/users/youssef/posts?last=&before=
+Authorization: {{user-token}}
+
+
+
+#### GET POST BY ID
+GET {{local}}/api/posts/768281534907875329
+Authorization: {{user-token}}
+
+
+
 #### POST TOGGLE_LIKE POST BY ID ENDPOINT
 POST {{local}}/api/posts/1/toggle_like
+Authorization: {{user-token}}
+
+
+
+#### GET LIST TIMELINE OF AUTH USER ENDPOINT
+GET {{local}}/api/timeline?last=&before=
 Authorization: {{user-token}}

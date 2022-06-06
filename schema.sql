@@ -50,8 +50,8 @@ INSERT INTO users (id,email,username) VALUES
       (2 , 'mamdouh@mamdouh.com' , 'Ahmed');
 
 
-INSERT INTO posts (id,user_id,content) VALUES
-     (1,1,'This is firstpost of first user');
+INSERT INTO posts (id,user_id,content,spoiler_of,nsfw) VALUES
+     (1,1,'This is firstpost of first user' , 'spoiler attr' , false);
 
 INSERT INTO timeline (id,user_id,post_id) VALUES
     (1,1,1);
