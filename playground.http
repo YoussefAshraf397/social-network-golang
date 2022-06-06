@@ -33,7 +33,7 @@ Content-Type: image/png
 
 
 #### TOGGLE FOLLOW ENDPOINT
-POST {{local}}/api/users/test/toggle_follow
+POST {{local}}/api/users/youssef/toggle_follow
 Authorization: {{user-token}}
 
 
@@ -59,3 +59,15 @@ Authorization: {{user-token}}
 #### GET Followees users ENDPOINT
 GET {{local}}/api/users/rr/get_followees?first=&after=
 Authorization: {{user-token}}
+
+
+#### POST CREATE POST ENDPOINT
+POST {{local}}/api/posts
+Authorization: {{user-token}}
+Content-Type: application/json
+
+{
+  "content": "new post",
+  "spoilerOf": "show name her",
+  "nsfw": true
+}
