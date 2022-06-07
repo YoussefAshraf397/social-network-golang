@@ -61,9 +61,8 @@ CREATE INDEX IF NOT EXISTS sorted_comments ON posts (created_at DESC);
 
 CREATE TABLE IF NOT EXISTS comment_likes (
                                           user_id INT NOT NULL REFERENCES users,
-                                          post_id INT NOT NULL REFERENCES posts,
                                           comment_id INT NOT NULL REFERENCES comments,
-                                          PRIMARY KEY (user_id , post_id , comment_id)
+                                          PRIMARY KEY (user_id  , comment_id)
     );
 
 

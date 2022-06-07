@@ -168,12 +168,12 @@ func (s *Service) ToggleCommentLike(ctx context.Context, commentID int64) (Toggl
 	if out.Liked {
 		query = "DELETE FROM comment_likes WHERE user_id = $1 AND post_id = $2"
 		if _, err = tx.ExecContext(ctx, query, uid, commentID); err != nil {
-			return out, fmt.Errorf("could not comment post like: %v", err)
+			return out, fmt.Errorf("could not like comment: %v", err)
 		}
 
 		query = "UPDATE comments SET likes_count = likes_count - 1 WHERE id = $1 RETURNING likes_count"
 		if err = tx.QueryRowContext(ctx, query, commentID).Scan(&out.LikesCount); err != nil {
-			return out, fmt.Errorf("could not update and decrement  comment like: %v", err)
+			return out, fmt.Errorf("could not update and decrement  post like: %v", err)
 		}
 	} else {
 		query = "INSERT INTO comment_likes (user_id, comment_id) VALUES ($1, $2)"
@@ -181,6 +181,9 @@ func (s *Service) ToggleCommentLike(ctx context.Context, commentID int64) (Toggl
 		//return out, fmt.Errorf("could not insert post like: %v", err)
 		if isForeignKeyViolation(err) {
 			return out, ErrCommentNotFound
+		}
+		if err != nil {
+			return out, fmt.Errorf("could not insert comment like: %v", err)
 		}
 
 		query = "UPDATE comments SET likes_count = likes_count + 1 WHERE id = $1 RETURNING likes_count"
