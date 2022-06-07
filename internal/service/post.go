@@ -23,16 +23,17 @@ type ToggleLikeOutput struct {
 }
 
 type Post struct {
-	ID         int64     `json:"id"`
-	UserID     int64     `json:"-"`
-	Content    string    `json:"content"`
-	SpoilerOf  *string   `json:"spoilerOf"`
-	NSFW       bool      `json:"nsfw"`
-	LikesCount int       `json:"likesCount"`
-	CreatedAt  time.Time `json:"createdAt"`
-	User       *User     `json:"user, omitempty"`
-	Mine       bool      `json:"mine"`
-	Liked      bool      `json:"liked"`
+	ID            int64     `json:"id"`
+	UserID        int64     `json:"-"`
+	Content       string    `json:"content"`
+	SpoilerOf     *string   `json:"spoilerOf"`
+	NSFW          bool      `json:"nsfw"`
+	LikesCount    int       `json:"likesCount"`
+	CommentsCount int       `json:"CommentsCount"`
+	CreatedAt     time.Time `json:"createdAt"`
+	User          *User     `json:"user, omitempty"`
+	Mine          bool      `json:"mine"`
+	Liked         bool      `json:"liked"`
 }
 
 //CreatePost user publish post to timeline
@@ -116,7 +117,7 @@ func (s *Service) Posts(ctx context.Context, username string, last int, before i
 	uid, auth := ctx.Value(KeyAuthUserId).(int64)
 	last = normalizePageSize(last)
 
-	q := `	SELECT id, content, spoiler_of, nsfw, likes_count, created_at 
+	q := `	SELECT id, content, spoiler_of, nsfw, likes_count, comments_count, created_at 
 				{{if .auth}}
 				, posts.user_id = @uid AS mine
 				, likes.user_id IS NOT NULL AS liked
@@ -152,7 +153,7 @@ func (s *Service) Posts(ctx context.Context, username string, last int, before i
 	pp := make([]Post, 0, last)
 	for rows.Next() {
 		var p Post
-		dest := []interface{}{&p.ID, &p.Content, &p.SpoilerOf, &p.NSFW, &p.LikesCount, &p.CreatedAt}
+		dest := []interface{}{&p.ID, &p.Content, &p.SpoilerOf, &p.NSFW, &p.LikesCount, &p.CommentsCount, &p.CreatedAt}
 		if auth {
 			dest = append(dest, &p.Mine, &p.Liked)
 		}
@@ -176,7 +177,7 @@ func (s *Service) Post(ctx context.Context, postID int64) (Post, error) {
 	var p Post
 	uid, auth := ctx.Value(KeyAuthUserId).(int64)
 
-	q := `	SELECT posts.id, content, spoiler_of, nsfw, likes_count, created_at 
+	q := `	SELECT posts.id, content, spoiler_of, nsfw, likes_count, comments_count, created_at 
 				, users.username, users.avatar
 				{{if .auth}}
 				, posts.user_id = @uid AS mine
@@ -202,7 +203,7 @@ INNER JOIN users ON posts.user_id = users.id
 
 	var u User
 	var avatar sql.NullString
-	dest := []interface{}{&p.ID, &p.Content, &p.SpoilerOf, &p.NSFW, &p.LikesCount, &p.CreatedAt, &u.Username, &avatar}
+	dest := []interface{}{&p.ID, &p.Content, &p.SpoilerOf, &p.NSFW, &p.LikesCount, &p.CommentsCount, &p.CreatedAt, &u.Username, &avatar}
 	if auth {
 		dest = append(dest, &p.Mine, &p.Liked)
 	}

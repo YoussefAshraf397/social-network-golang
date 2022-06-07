@@ -81,7 +81,7 @@ Authorization: {{user-token}}
 
 
 #### GET POST BY ID
-GET {{local}}/api/posts/768281534907875329
+GET {{local}}/api/posts/1
 Authorization: {{user-token}}
 
 
