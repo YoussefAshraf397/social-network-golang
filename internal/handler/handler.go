@@ -32,6 +32,10 @@ func New(s *service.Service) http.Handler {
 
 	api.HandleFunc("GET", "/timeline", h.timeline)
 
+	api.HandleFunc("GET", "/posts/:postID/comments", h.comments)
+	api.HandleFunc("POST", "/posts/:postID/comments", h.createComment)
+	api.HandleFunc("POST", "/comments/:commentID/toggle_like", h.toggleCommentLike)
+
 	r := way.NewRouter()
 	r.Handle("*", "/api...", http.StripPrefix("/api", h.withAuth(api)))
 	return r

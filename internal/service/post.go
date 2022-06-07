@@ -280,10 +280,6 @@ func (s *Service) TogglePostLike(ctx context.Context, postID int64) (ToggleLikeO
 			return out, fmt.Errorf("could not delete post like: %v", err)
 		}
 
-		//if isForeignKeyViolation(err) {
-		//	return out, ErrPostNotFound
-		//}
-
 		query = "UPDATE posts SET likes_count = likes_count - 1 WHERE id = $1 RETURNING likes_count"
 		if err = tx.QueryRowContext(ctx, query, postID).Scan(&out.LikesCount); err != nil {
 			return out, fmt.Errorf("could not update and decrement  post like: %v", err)
