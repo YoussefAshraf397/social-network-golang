@@ -3,7 +3,7 @@ package main
 import (
 	"database/sql"
 	"github.com/hako/branca"
-	_ "github.com/jackc/pgx/stdlib"
+	_ "github.com/lib/pq"
 	"log"
 	"net/http"
 	"os"
@@ -20,7 +20,7 @@ func main() {
 		databaseURL = env("DATABASE_URL", "postgresql://root@127.0.0.1:26257/socialnetwork?sslmode=disable")
 		Branka_Key  = env("BRANCA_KEY", "supersecretkeyyoushouldnotcommit")
 	)
-	db, err := sql.Open("pgx", databaseURL)
+	db, err := sql.Open("postgres", databaseURL)
 	if err != nil {
 		log.Fatalln("cloud not open database connection: %v\n", err)
 		return

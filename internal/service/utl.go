@@ -3,7 +3,7 @@ package service
 import (
 	"bytes"
 	"fmt"
-	"github.com/jackc/pgx"
+	"github.com/lib/pq"
 	"html/template"
 	"strings"
 )
@@ -17,13 +17,13 @@ const (
 var queriesCache = make(map[string]*template.Template)
 
 func isUniqueViolation(err error) bool {
-	pgerror, ok := err.(pgx.PgError)
-	return ok && pgerror.Code == "23505"
+	pqerror, ok := err.(*pq.Error)
+	return ok && pqerror.Code == "23505"
 }
 
 func isForeignKeyViolation(err error) bool {
-	pgerror, ok := err.(pgx.PgError)
-	return ok && pgerror.Code == "23503"
+	pqerror, ok := err.(*pq.Error)
+	return ok && pqerror.Code == "23503"
 }
 
 func buildQuery(text string, data map[string]interface{}) (string, []interface{}, error) {
