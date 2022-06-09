@@ -215,3 +215,95 @@ func (s *Service) notifyComment(c Comment) {
 	}
 	//TODO: Broadcast comment notification
 }
+
+func (s *Service) notifyPostMention(p Post) {
+	mentions := collectMentions(p.Content)
+	log.Printf("mentions: %v+v\n", mentions)
+
+	if len(mentions) == 0 {
+		log.Println("no mentions")
+
+		return
+	}
+	actors := []string{p.User.Username}
+
+	q := `
+		INSERT INTO notifications (user_id, actors, type, post_id)
+		SELECT users.id , $1 , 'post_mention' , $2 FROM users
+		WHERE users.id != $3
+			AND username = ANY($4)
+		RETURNING id, user_id, issued_at`
+	rows, err := s.db.Query(q, pq.Array(actors), p.ID, p.UserID, pq.Array(mentions))
+	if err != nil {
+		log.Printf("could not insert post mention notification: %v\n", err)
+		return
+	}
+	defer rows.Close()
+
+	nn := []Notification{}
+	for rows.Next() {
+		var n Notification
+		if err = rows.Scan(&n.ID, &n.UserID, &n.IssuedAt); err != nil {
+			log.Printf("could not scan comment notification: %v\n", err)
+			return
+		}
+		n.Actors = actors
+		n.Type = "post_mention"
+		n.PostID = &p.ID
+		nn = append(nn, n)
+	}
+	if err = rows.Err(); err != nil {
+		log.Printf("could not iterate post mention notification: %v\n", err)
+		return
+	}
+	log.Printf("notifications: %v+v\n", nn)
+
+	//TODO: Broadcast post mention notification.
+
+}
+
+func (s *Service) notifyCommentMention(c Comment) {
+	mentions := collectMentions(c.Content)
+	log.Printf("mentions: %v+v\n", mentions)
+
+	if len(mentions) == 0 {
+		log.Println("no mentions.")
+		return
+	}
+	actor := c.User.Username
+
+	q := `
+		INSERT INTO notifications (user_id, actors, type, post_id)
+		SELECT users.id , $1 , 'comment_mention' , $2 FROM users
+		WHERE users.id != $3
+			AND username = ANY($4)
+		ON CONFLICT (user_id , type , post_id , read) DO UPDATE SET
+			actors = array_prepend($5 , array_remove(notifications.actors , $5)) ,
+			issued_at = now()
+		RETURNING id, user_id, actors, issued_at`
+	rows, err := s.db.Query(q, pq.Array([]string{actor}), c.PostID, c.UserID, pq.Array(mentions), actor)
+	if err != nil {
+		log.Printf("could not insert comment mention notification: %v\n", err)
+		return
+	}
+	defer rows.Close()
+
+	nn := []Notification{}
+	for rows.Next() {
+		var n Notification
+		if err = rows.Scan(&n.ID, &n.UserID, pq.Array(&n.Actors), &n.IssuedAt); err != nil {
+			log.Printf("could not scan comment notification: %v\n", err)
+			return
+		}
+		n.Type = "comment_mention"
+		n.PostID = &c.PostID
+		nn = append(nn, n)
+	}
+	if err = rows.Err(); err != nil {
+		log.Printf("could not iterate comment mention notification: %v\n", err)
+		return
+	}
+	log.Printf("notifications: %v+v\n", nn)
+	//TODO: Broadcast comment mention notification.
+
+}

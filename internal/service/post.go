@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/sanity-io/litter"
 	"log"
 	"strings"
 	"time"
@@ -94,29 +93,71 @@ func (s *Service) CreatePost(ctx context.Context, content string, spoilerOf *str
 	if err = tx.Commit(); err != nil {
 		return ti, fmt.Errorf("could not commit to create post: %v", err)
 	}
-
-	go func(p Post) {
-		u, err := s.UserByID(context.Background(), p.UserID)
-		if err != nil {
-			log.Printf("could not get post user %v\n", err)
-			return
-		}
-		p.User = &u
-		p.Mine = false
-		p.Subscribed = false
-
-		tt, err := s.fanoutPost(p)
-		if err != nil {
-			log.Printf("could not fanout post: %v\n", err)
-		}
-		for _, ti = range tt {
-			log.Println(litter.Sdump(ti))
-
-		}
-
-	}(ti.Post)
+	go s.postCreated(ti.Post)
+	//go func(p Post) {
+	//	u, err := s.UserByID(context.Background(), p.UserID)
+	//	if err != nil {
+	//		log.Printf("could not get post user %v\n", err)
+	//		return
+	//	}
+	//	p.User = &u
+	//	p.Mine = false
+	//	p.Subscribed = false
+	//
+	//	tt, err := s.fanoutPost(p)
+	//	if err != nil {
+	//		log.Printf("could not fanout post: %v\n", err)
+	//	}
+	//	for _, ti = range tt {
+	//		log.Println(litter.Sdump(ti))
+	//
+	//	}
+	//
+	//}(ti.Post)
 
 	return ti, nil
+}
+
+func (s *Service) postCreated(p Post) {
+	u, err := s.UserByID(context.Background(), p.UserID)
+	if err != nil {
+		log.Println("could not fetch post user: %v\n", err)
+		return
+	}
+	p.User = &u
+	p.Mine = false
+	p.Subscribed = false
+
+	go s.fanoutPost(p)
+	go s.notifyPostMention(p)
+}
+
+func (s *Service) fanoutPost(p Post) ([]TimeLineItem, error) {
+	query := "INSERT INTO timeline (user_id, post_id)" +
+		"SELECT follower_id, $1 FROM follows WHERE followee_id = $2 " +
+		"RETURNING id, user_id"
+	rows, err := s.db.Query(query, p.ID, p.UserID)
+	if err != nil {
+		return nil, fmt.Errorf("could not insert to timeline: %v", err)
+	}
+	defer rows.Close()
+
+	tt := []TimeLineItem{}
+	for rows.Next() {
+		var ti TimeLineItem
+		if err = rows.Scan(&ti.ID, &ti.UserID); err != nil {
+			return nil, fmt.Errorf("could not scan timeline item: %v", err)
+		}
+		ti.PostID = p.ID
+		ti.Post = p
+
+		tt = append(tt, ti)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("could not iterate timeline records: %v", err)
+	}
+	return tt, nil
 }
 
 //Posts
@@ -240,34 +281,6 @@ INNER JOIN users ON posts.user_id = users.id
 	p.User = &u
 
 	return p, nil
-}
-
-func (s *Service) fanoutPost(p Post) ([]TimeLineItem, error) {
-	query := "INSERT INTO timeline (user_id, post_id)" +
-		"SELECT follower_id, $1 FROM follows WHERE followee_id = $2 " +
-		"RETURNING id, user_id"
-	rows, err := s.db.Query(query, p.ID, p.UserID)
-	if err != nil {
-		return nil, fmt.Errorf("could not insert to timeline: %v", err)
-	}
-	defer rows.Close()
-
-	tt := []TimeLineItem{}
-	for rows.Next() {
-		var ti TimeLineItem
-		if err = rows.Scan(&ti.ID, &ti.UserID); err != nil {
-			return nil, fmt.Errorf("could not scan timeline item: %v", err)
-		}
-		ti.PostID = p.ID
-		ti.Post = p
-
-		tt = append(tt, ti)
-	}
-
-	if err = rows.Err(); err != nil {
-		return nil, fmt.Errorf("could not iterate timeline records: %v", err)
-	}
-	return tt, nil
 }
 
 //TogglePostLike
