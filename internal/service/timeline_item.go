@@ -24,11 +24,14 @@ func (s *Service) Timeline(ctx context.Context, last int, before int64) ([]TimeL
 				, posts.user_id = @uid AS mine
 				, likes.user_id IS NOT NULL AS liked
 				, users.username, users.avatar
+				, subscriptions.user_id IS NOT NULL AS subscribed
 				FROM timeline
 				INNER JOIN posts ON timeline.post_id = posts.id
 				INNER JOIN users ON timeline.user_id = users.id
 				LEFT JOIN post_likes AS likes
 					ON likes.user_id = @uid AND likes.post_id = posts.id
+				LEFT JOIN post_subscriptions AS subscriptions
+					ON subscriptions.user_id = @uid AND subscriptions.post_id = posts.id
 				WHERE timeline.user_id = @uid
 				{{if .before}}AND timeline.id < @before{{end}}
 				ORDER BY created_at DESC
@@ -66,6 +69,7 @@ func (s *Service) Timeline(ctx context.Context, last int, before int64) ([]TimeL
 			&t.Post.CreatedAt,
 			&t.Post.Mine,
 			&t.Post.Liked,
+			&t.Post.Subscribed,
 			&u.Username,
 			&avatar,
 		}

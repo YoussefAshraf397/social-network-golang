@@ -46,6 +46,12 @@ CREATE TABLE IF NOT EXISTS post_likes (
     PRIMARY KEY (user_id , post_id)
 );
 
+CREATE TABLE IF NOT EXISTS post_subscriptions (
+      user_id INT NOT NULL REFERENCES users,
+      post_id INT NOT NULL REFERENCES posts,
+      PRIMARY KEY (user_id , post_id)
+);
+
 
 CREATE TABLE IF NOT EXISTS comments (
      id SERIAL NOT NULL PRIMARY KEY ,
@@ -71,22 +77,28 @@ CREATE TABLE IF NOT EXISTS notifications (
     user_id INT NOT NULL REFERENCES users ,
     actors VARCHAR[] NOT NULL,
     type VARCHAR NOT NULL,
+    post_id INT NOT NULL REFERENCES posts ,
     read BOOLEAN NOT NULL DEFAULT false,
     issued_at TIMESTAMPTZ NOT NULL DEFAULT now()
     );
 
 CREATE INDEX IF NOT EXISTS sorted_notifications ON notifications (issued_at DESC);
 
+CREATE UNIQUE INDEX IF NOT EXISTS unique_notifications ON notifications (user_id, type, post_id, read);
 
 
 INSERT INTO users (id,email,username) VALUES
       (1,'youssef@youssef.com' , 'youssef'),
       (2 , 'mamdouh@mamdouh.com' , 'Ahmed'),
-      (3 , 'twst@test.com' , 'test');
+      (3 , 'test1@test.com' , 'test1'),
+      (4 , 'test2@test.com' , 'test2');
 
 
 INSERT INTO posts (id,user_id,content,spoiler_of,nsfw,comments_count) VALUES
      (1,1,'This is first post of first user' , 'spoiler attr' , false , 1);
+
+INSERT INTO post_subscriptions (user_id,post_id) VALUES
+    (1,1);
 
 INSERT INTO timeline (id,user_id,post_id) VALUES
     (1,1,1);

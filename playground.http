@@ -14,7 +14,7 @@ POST {{local}}/api/login
 Content-Type: application/json
 
 {
-  "email" : "mamdouh@mamdouh.com"
+  "email" : "youssef@youssef.com"
 }
 
 
@@ -88,6 +88,12 @@ Authorization: {{user-token}}
 
 #### POST TOGGLE_LIKE POST BY ID ENDPOINT
 POST {{local}}/api/posts/1/toggle_like
+Authorization: {{user-token}}
+
+
+
+#### POST TOGGLE_POST_SUBSCRIPTION POST BY ID ENDPOINT
+POST {{local}}/api/posts/1/toggle_subscription
 Authorization: {{user-token}}
 
 
