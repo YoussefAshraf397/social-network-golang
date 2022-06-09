@@ -66,10 +66,23 @@ CREATE TABLE IF NOT EXISTS comment_likes (
     );
 
 
+CREATE TABLE IF NOT EXISTS notifications (
+    id SERIAL NOT NULL PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES users ,
+    actors VARCHAR[] NOT NULL,
+    type VARCHAR NOT NULL,
+    read BOOLEAN NOT NULL DEFAULT false,
+    issued_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+
+CREATE INDEX IF NOT EXISTS sorted_notifications ON notifications (issued_at DESC);
+
+
 
 INSERT INTO users (id,email,username) VALUES
       (1,'youssef@youssef.com' , 'youssef'),
-      (2 , 'mamdouh@mamdouh.com' , 'Ahmed');
+      (2 , 'mamdouh@mamdouh.com' , 'Ahmed'),
+      (3 , 'twst@test.com' , 'test');
 
 
 INSERT INTO posts (id,user_id,content,spoiler_of,nsfw,comments_count) VALUES

@@ -4,8 +4,8 @@ POST {{local}}/api/users
 Content-Type: application/json
 
 {
-  "email" : "test@ahsraf.com",
-  "username"  : "test"
+  "email" : "testa@test.com",
+  "username"  : "testa"
 }
 
 
@@ -14,7 +14,7 @@ POST {{local}}/api/login
 Content-Type: application/json
 
 {
-  "email" : "test@ahsraf.com"
+  "email" : "mamdouh@mamdouh.com"
 }
 
 
@@ -33,13 +33,13 @@ Content-Type: image/png
 
 
 #### TOGGLE FOLLOW ENDPOINT
-POST {{local}}/api/users/youssef/toggle_follow
+POST {{local}}/api/users/Ahmed/toggle_follow
 Authorization: {{user-token}}
 
 
 
 #### GET USER PROFILE ENDPOINT
-GET {{local}}/api/users/joejoe
+GET {{local}}/api/users/Ahmed
 Authorization: {{user-token}}
 
 
@@ -51,13 +51,13 @@ Authorization: {{user-token}}
 
 
 #### GET Follower users ENDPOINT
-GET {{local}}/api/users/test/get_followers?first=&after=
+GET {{local}}/api/users/Ahmed/get_followers?first=&after=
 Authorization: {{user-token}}
 
 
 
 #### GET Followees users ENDPOINT
-GET {{local}}/api/users/rr/get_followees?first=&after=
+GET {{local}}/api/users/Ahmed/get_followees?first=&after=
 Authorization: {{user-token}}
 
 
@@ -114,4 +114,22 @@ Authorization: {{user-token}}
 
 #### POST LIKE COMMENT ON POST
 POST {{local}}/api/comments/1/toggle_like
+Authorization: {{user-token}}
+
+
+
+#### GET ALL NOTIFICATION OF AUTH USER ENDPOINT
+GET {{local}}/api/notifications
+Authorization: {{user-token}}
+
+
+
+#### POST NOTIFICATION OF AUTH USER AS READ ENDPOINT
+POST {{local}}/api/notifications/768838558596366337/mark_as_read
+Authorization: {{user-token}}
+
+
+
+#### POST NOTIFICATION OF AUTH USER AS READ ENDPOINT
+POST {{local}}/api/mark_notifications_as_read
 Authorization: {{user-token}}
