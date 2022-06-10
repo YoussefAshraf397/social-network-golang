@@ -7,6 +7,7 @@ require (
 	github.com/eknkc/basex v1.0.1 // indirect
 	github.com/hako/branca v0.0.0-20200807062402-6052ac720505
 	github.com/jackc/pgx v3.6.2+incompatible
+	github.com/joho/godotenv v1.4.0
 	github.com/lib/pq v1.10.6
 	github.com/matoous/go-nanoid v1.5.0
 	github.com/matryer/way v0.0.0-20180416093233-9632d0c407b0

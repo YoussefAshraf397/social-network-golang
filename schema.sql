@@ -11,7 +11,16 @@ CREATE TABLE IF NOT EXISTS users (
     followees_count INT NOT NULL DEFAULT 0 CHECK (followees_count >= 0)
 );
 
-CREATE TABLE IF NOT EXISTS follows (
+CREATE TABLE IF NOT EXISTS verification_codes (
+    id UUID NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id INT NOT NULL REFERENCES users ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+
+    );
+
+
+
+    CREATE TABLE IF NOT EXISTS follows (
    follower_id INT NOT NULL REFERENCES users ON DELETE CASCADE,
    followee_id INT NOT NULL REFERENCES users ON DELETE CASCADE,
    PRIMARY KEY (follower_id, followee_id)
