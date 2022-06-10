@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 )
 
 type TimeLineItem struct {
@@ -11,6 +12,11 @@ type TimeLineItem struct {
 	UserID int64 `json:"-"`
 	PostID int64 `json:"-"`
 	Post   Post  `json:"post"`
+}
+
+type timelineItemClient struct {
+	timeline chan TimeLineItem
+	userID   int64
 }
 
 func (s *Service) Timeline(ctx context.Context, last int, before int64) ([]TimeLineItem, error) {
@@ -23,8 +29,9 @@ func (s *Service) Timeline(ctx context.Context, last int, before int64) ([]TimeL
 	q := `	SELECT timeline.id, posts.id, content, spoiler_of, nsfw, likes_count, comments_count, created_at
 				, posts.user_id = @uid AS mine
 				, likes.user_id IS NOT NULL AS liked
-				, users.username, users.avatar
 				, subscriptions.user_id IS NOT NULL AS subscribed
+				, users.username, users.avatar
+				
 				FROM timeline
 				INNER JOIN posts ON timeline.post_id = posts.id
 				INNER JOIN users ON timeline.user_id = users.id
@@ -85,7 +92,8 @@ func (s *Service) Timeline(ctx context.Context, last int, before int64) ([]TimeL
 
 		t.Post.User = &u
 
-		tt = append(tt, t)
+		go s.broadcastTimelineItem(t)
+		//tt = append(tt, t)
 	}
 
 	if err = rows.Err(); err != nil {
@@ -93,4 +101,37 @@ func (s *Service) Timeline(ctx context.Context, last int, before int64) ([]TimeL
 	}
 
 	return tt, nil
+}
+
+//SubscribedToTimeline to receive timeline item in realtime
+func (s *Service) SubscribedToTimeline(ctx context.Context) (chan TimeLineItem, error) {
+	uid, ok := ctx.Value(KeyAuthUserId).(int64)
+	if !ok {
+		return nil, ErrUnauthenticated
+	}
+
+	tt := make(chan TimeLineItem)
+	c := &timelineItemClient{timeline: tt, userID: uid}
+	s.timelineItemClients.Store(c, struct{}{})
+
+	go func() {
+		<-ctx.Done()
+		s.timelineItemClients.Delete(c)
+		close(tt)
+
+	}()
+
+	return tt, nil
+}
+
+func (s *Service) broadcastTimelineItem(ti TimeLineItem) {
+	s.timelineItemClients.Range(func(key, value interface{}) bool {
+		client := key.(*timelineItemClient)
+		if client.userID == ti.UserID {
+			log.Printf(" test timeline", ti)
+
+			client.timeline <- ti
+		}
+		return true
+	})
 }

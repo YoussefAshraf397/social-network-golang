@@ -1,5 +1,6 @@
 package service
 
+import "C"
 import (
 	"context"
 	"database/sql"
@@ -24,6 +25,12 @@ type Comment struct {
 	User       *User     `json:"user,omitempty"`
 	Mine       bool      `json:"mine"`
 	Liked      bool      `json:"liked"`
+}
+
+type commentClient struct {
+	comments chan Comment
+	postID   int64
+	userID   *int64
 }
 
 //CreateComment on a post
@@ -90,6 +97,7 @@ func (s *Service) commentCreated(c Comment) {
 
 	go s.notifyComment(c)
 	go s.notifyCommentMention(c)
+	go s.broadcastComment(c)
 	//TODo: Broadcat comment
 
 }
@@ -222,4 +230,36 @@ func (s *Service) ToggleCommentLike(ctx context.Context, commentID int64) (Toggl
 
 	return out, nil
 
+}
+
+//SubscribedToComments to receive comment in realtime
+func (s *Service) SubscribedToComments(ctx context.Context, postID int64) chan Comment {
+
+	cc := make(chan Comment)
+	c := &commentClient{comments: cc, postID: postID}
+	if uid, ok := ctx.Value(KeyAuthUserId).(int64); ok {
+		c.userID = &uid
+	}
+
+	s.commentClients.Store(c, struct{}{})
+
+	go func() {
+		<-ctx.Done()
+		s.commentClients.Delete(c)
+		close(cc)
+
+	}()
+
+	return cc
+}
+
+func (s *Service) broadcastComment(c Comment) {
+	s.commentClients.Range(func(key, value interface{}) bool {
+		client := key.(*commentClient)
+		if client.postID == c.PostID && !(client.userID != nil && *client.userID == c.UserID) {
+			log.Printf(" test", c)
+			client.comments <- c
+		}
+		return true
+	})
 }

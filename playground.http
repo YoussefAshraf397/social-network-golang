@@ -14,7 +14,7 @@ POST {{local}}/api/login
 Content-Type: application/json
 
 {
-  "email" : "test2@test.com"
+  "email" : "mamdouh@mamdouh.com"
 }
 
 
@@ -67,7 +67,7 @@ Authorization: {{user-token}}
 Content-Type: application/json
 
 {
-  "content": "new possddsdst mention @Ahmed, @test1",
+  "content": "new post",
   "spoilerOf": "show name herdsdsdsds",
   "nsfw": true
 }

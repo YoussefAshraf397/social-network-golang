@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS notifications (
     user_id INT NOT NULL REFERENCES users ,
     actors VARCHAR[] NOT NULL,
     type VARCHAR NOT NULL,
-    post_id INT NOT NULL REFERENCES posts ,
+    post_id INT  REFERENCES posts ,
     read BOOLEAN NOT NULL DEFAULT false,
     issued_at TIMESTAMPTZ NOT NULL DEFAULT now()
     );

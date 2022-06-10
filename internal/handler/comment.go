@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"github.com/matryer/way"
+	"mime"
 	"net/http"
 	"social-network/internal/service"
 	"strconv"
@@ -44,6 +45,11 @@ func (h *handler) createComment(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) comments(w http.ResponseWriter, r *http.Request) {
+	if a, _, err := mime.ParseMediaType(r.Header.Get("Accept")); err == nil && a == "text/stream" {
+		h.subscribedToComments(w, r)
+		return
+	}
+
 	ctx := r.Context()
 	q := r.URL.Query()
 
@@ -78,4 +84,25 @@ func (h *handler) toggleCommentLike(w http.ResponseWriter, r *http.Request) {
 	}
 	respond(w, out, http.StatusOK)
 
+}
+
+func (h *handler) subscribedToComments(w http.ResponseWriter, r *http.Request) {
+	f, ok := w.(http.Flusher)
+	if !ok {
+		respondError(w, errStreamingUnsupported)
+		return
+	}
+
+	ctx := r.Context()
+	postID, _ := strconv.ParseInt(way.Param(ctx, "postID"), 10, 64)
+
+	header := w.Header()
+	header.Set("cache-control", "no-cache")
+	header.Set("connection", "keep-alive")
+	header.Set("content-type", "text/event-stream")
+
+	for c := range h.SubscribedToComments(ctx, postID) {
+		writeSSE(w, c)
+		f.Flush()
+	}
 }
