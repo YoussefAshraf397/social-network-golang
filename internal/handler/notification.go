@@ -96,3 +96,19 @@ func (h *handler) subscribedToNotifications(w http.ResponseWriter, r *http.Reque
 		f.Flush()
 	}
 }
+
+func (h *handler) hasUnreadNotifications(w http.ResponseWriter, r *http.Request) {
+	unread, err := h.HasUnreadNotifications(r.Context())
+	if err != service.ErrUnauthenticated {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	if err != nil {
+		respondError(w, err)
+		return
+	}
+
+	respond(w, unread, http.StatusOK)
+
+}

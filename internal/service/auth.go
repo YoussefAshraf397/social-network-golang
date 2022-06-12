@@ -35,6 +35,11 @@ type LoginOutput struct {
 	AuthUser  User      `json:"authUser"`
 }
 
+type TokenOutput struct {
+	Token     string
+	ExpiresAt time.Time
+}
+
 var rxUUID = regexp.MustCompile("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
 
 var (
@@ -65,8 +70,22 @@ func (s *Service) SendMagicLink(ctx context.Context, email, redirectURI string) 
 	if isForeignKeyViolation(err) {
 		return ErrUserNotFound
 	}
+	//TODO: check email is exist or not
 	if err != nil {
 		return fmt.Errorf("could not insert verification code: %v", err)
+	}
+
+	var code string
+	err = s.db.QueryRowContext(ctx, `
+INSERT INTO verification_codes (user_id) VALUES  (
+									 ( SELECT id FROM userHERE email = $1)
+) RETURNING id`, email).Scan(&code)
+
+	if isForeignKeyViolation(err) {
+		return ErrUserNotFound
+	}
+	if err != nil {
+		return fmt.Errorf("could not inser verification code: %v", err)
 	}
 
 	magicLink, _ := url.Parse(s.origin)
@@ -92,9 +111,12 @@ func (s *Service) SendMagicLink(ctx context.Context, email, redirectURI string) 
 		return fmt.Errorf("could not execute magic link template: %v", err)
 	}
 
+	//s.sender.Send(email, "Magic Link", mail.String())
 	if err = s.sendMail(email, "Magic Link", mail.String()); err != nil {
 		return fmt.Errorf("could not send magic link: %v", err)
 	}
+
+	go s.deleteExpiredVerificationCodesCronJob(code)
 
 	return nil
 }
@@ -207,19 +229,31 @@ func (s *Service) AuthUser(ctx context.Context) (User, error) {
 	}
 
 	return s.UserByID(ctx, uid)
+
 }
-func (s *Service) deleteExpiredVerificationCodesCronJob(ctx context.Context) {
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case <-time.After(time.Hour * 24):
-			if _, err := s.db.ExecContext(ctx, fmt.Sprintf(`DELETE FROM verification_codes WHERE created_at < now() - INTERVAL  '%dm'`,
-				int(verificationCodeLifeSpan.Minutes()))); err != nil {
-				log.Printf("could not delete expired verification codes: %v", err)
 
-			}
+func (s *Service) Token(ctx context.Context) (TokenOutput, error) {
+	var out TokenOutput
 
-		}
+	uid, ok := ctx.Value(KeyAuthUserId).(int64)
+	if !ok {
+		return out, ErrUnauthenticated
+	}
+
+	var err error
+	out.Token, err = s.codec.EncodeToString(strconv.FormatInt(uid, 10))
+	if err != nil {
+		return out, fmt.Errorf("could not create token: %v", err)
+	}
+
+	out.ExpiresAt = time.Now().Add(tokenLifeSpan)
+	return out, nil
+
+}
+
+func (s *Service) deleteExpiredVerificationCodesCronJob(code string) {
+	<-time.After(verificationCodeLifeSpan)
+	if _, err := s.db.Exec(`DELETE FROM verification_codes WHERE id = $1`, code); err != nil {
+		log.Printf("could not delete expired verfication code: %v\n", err)
 	}
 }

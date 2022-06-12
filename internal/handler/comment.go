@@ -2,11 +2,13 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/matryer/way"
 	"mime"
 	"net/http"
 	"social-network/internal/service"
 	"strconv"
+	"time"
 )
 
 type CreateCommentInput struct {
@@ -101,8 +103,18 @@ func (h *handler) subscribedToComments(w http.ResponseWriter, r *http.Request) {
 	header.Set("connection", "keep-alive")
 	header.Set("content-type", "text/event-stream")
 
-	for c := range h.SubscribedToComments(ctx, postID) {
-		writeSSE(w, c)
-		f.Flush()
+	cc := h.SubscribedToComments(ctx, postID)
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-time.After(h.ping):
+			fmt.Fprint(w, "ping \n\n")
+			f.Flush()
+		case c := <-cc:
+			writeSSE(w, c)
+			f.Flush()
+		}
 	}
 }

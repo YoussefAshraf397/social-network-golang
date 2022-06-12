@@ -113,6 +113,22 @@ func (h *handler) authUser(w http.ResponseWriter, r *http.Request) {
 	respond(w, u, http.StatusOK)
 }
 
+func (h *handler) token(w http.ResponseWriter, r *http.Request) {
+
+	out, err := h.Token(r.Context())
+	if err == service.ErrUnauthenticated {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+	if err != nil {
+		respondError(w, err)
+		return
+	}
+
+	respond(w, out, http.StatusOK)
+
+}
+
 func (h *handler) withAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		a := r.Header.Get("Authorization")

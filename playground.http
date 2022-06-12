@@ -23,7 +23,7 @@ POST {{local}}/api/send_magic_link
 Content-Type: application/json
 
 {
-  "email" : "mamdouh@mamdouh.com",
+
   "redirectURI" : "http://localhost:3000/auth_redirect"
 }
 

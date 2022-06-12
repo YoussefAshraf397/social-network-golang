@@ -10,6 +10,7 @@ import (
 	"social-network/internal/handler"
 	"social-network/internal/service"
 	"strconv"
+	"time"
 )
 
 const ()
@@ -38,6 +39,13 @@ func main() {
 		return
 	}
 
+	//sender := mailing.NewSender(
+	//	"noreply@"+Origin,
+	//	smtpHost,
+	//	string(smtpPort),
+	//	smtpUsername,
+	//	smtpPassword)
+
 	s := service.New(service.Config{
 		DB:           db,
 		Origin:       Origin,
@@ -47,10 +55,20 @@ func main() {
 		SMTPUsername: smtpUsername,
 		SMTPPassword: smtpPassword,
 	})
-	h := handler.New(s)
+
+	server := http.Server{
+		Addr:              ":" + Port,
+		Handler:           handler.New(s, time.Second*15, true),
+		ReadHeaderTimeout: time.Second * 5,
+		ReadTimeout:       time.Second * 15,
+		WriteTimeout:      time.Second * 15,
+		IdleTimeout:       time.Second * 30,
+	}
+
+	//h := handler.New(s, server.IdleTimeout)
 
 	log.Println("accepting connection on port %s\n", Port)
-	if err = http.ListenAndServe(":"+Port, h); err != nil {
+	if err = http.ListenAndServe(":"+Port, server.Handler); err != nil {
 		log.Fatalf("could not start server %v\n", err)
 	}
 }

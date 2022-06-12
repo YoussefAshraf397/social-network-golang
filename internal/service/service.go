@@ -1,7 +1,6 @@
 package service
 
 import (
-	"context"
 	"database/sql"
 	"github.com/hako/branca"
 	"net"
@@ -50,7 +49,7 @@ func New(cfg Config) *Service {
 		smtpAuth: smtp.PlainAuth("", cfg.SMTPUsername, cfg.SMTPPassword, cfg.SMTPHost),
 	}
 
-	go s.deleteExpiredVerificationCodesCronJob(context.Background())
+	//go s.deleteExpiredVerificationCodesCronJob(context.Background())
 	return s
 
 }

@@ -2,16 +2,19 @@ package handler
 
 import (
 	"github.com/matryer/way"
+	"mime"
 	"net/http"
 	"social-network/internal/service"
+	"time"
 )
 
 type handler struct {
 	*service.Service
+	ping time.Duration
 }
 
-func New(s *service.Service) http.Handler {
-	h := &handler{s}
+func New(s *service.Service, ping time.Duration, inLocalhost bool) http.Handler {
+	h := &handler{Service: s, ping: ping}
 
 	api := way.NewRouter()
 	api.HandleFunc("POST", "/send_magic_link", h.sendMagicLink)
@@ -19,6 +22,8 @@ func New(s *service.Service) http.Handler {
 
 	api.HandleFunc("POST", "/login", h.login)
 	api.HandleFunc("GET", "/auth_user", h.authUser)
+	api.HandleFunc("GET", "/token", h.token)
+
 	api.HandleFunc("POST", "/users", h.createUser)
 	api.HandleFunc("PUT", "/auth_user/avatar", h.updateavatar)
 
@@ -44,8 +49,16 @@ func New(s *service.Service) http.Handler {
 	api.HandleFunc("GET", "/notifications", h.notifications)
 	api.HandleFunc("POST", "/notifications/:notificationID/mark_as_read", h.markNotificationAsRead)
 	api.HandleFunc("POST", "/mark_notifications_as_read", h.markAllNotificationAsRead)
+	api.HandleFunc("GET", "/has_unread_notifications", h.hasUnreadNotifications)
+
+	mime.AddExtensionType(".js", "application/javascript; charset=utf-8")
+	fs := http.FileServer(&spaFileSystem{http.Dir("web/static")})
+	if inLocalhost {
+		fs = NoCache(fs)
+	}
 
 	r := way.NewRouter()
 	r.Handle("*", "/api...", http.StripPrefix("/api", h.withAuth(api)))
+	r.Handle("GET", "/...", fs)
 	return r
 }

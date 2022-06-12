@@ -107,6 +107,23 @@ func (s *Service) MarkAllNotificationAsRead(ctx context.Context) error {
 
 }
 
+func (s *Service) HasUnreadNotifications(ctx context.Context) (bool, error) {
+	uid, ok := ctx.Value(KeyAuthUserId).(int64)
+	if !ok {
+		return false, ErrUnauthenticated
+	}
+
+	var unread bool
+	query := `SELECT EXISTS (
+			 	SELECT 1 from notifications WHERE user_id = $1 AND read = false
+			)`
+	if err := s.db.QueryRowContext(ctx, query, uid).Scan(&unread); err != nil {
+		return false, fmt.Errorf("could not query select un read notifications existence: %v", err)
+	}
+
+	return unread, nil
+}
+
 func (s *Service) notifyFollow(followerID, followeeID int64) {
 	tx, err := s.db.Begin()
 	if err != nil {
