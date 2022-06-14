@@ -61,7 +61,7 @@ func (h *handler) posts(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	q := r.URL.Query()
 	last, _ := strconv.Atoi(q.Get("last"))
-	before, _ := strconv.ParseInt(q.Get("before"), 10, 64)
+	before, _ := strconv.ParseInt(q.Get("before"), 25, 64)
 	pp, err := h.Posts(ctx, way.Param(ctx, "username"), last, before)
 	if err == service.ErrInvalidUsername {
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)

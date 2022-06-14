@@ -86,7 +86,7 @@ Content-Type: application/json
 
 
 #### GET ALL POSTS
-GET {{local}}/api/users/youssef/posts?last=&before=770560339577405441
+GET {{local}}/api/users/youssef/posts?last=&before=
 Authorization: {{user-token}}
 
 
