@@ -2,7 +2,8 @@
     --color-bg-root: black;
     --color-bg-controls: rgb(24,22,26);
     --color-text: white;
-    --color-accent: #600b9f
+    --color-accent: #600b9f;
+    --color-border: blue;
 }
 
 body {
@@ -24,3 +25,100 @@ input {
 a{
     color: var(--color-accent);
 }
+
+.container.wid {
+    max-width: 120ch;
+}
+.post-form {
+    display: grid;
+    grid-auto-flow: row;
+    gap: 0.5rem;
+}
+.post-form-button {
+    margin-top: .5rem;
+}
+
+.post-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.post-item + .post-item {
+   border-top: 1px solid var(--color-border)
+}
+
+.post {
+    padding: 1rem;
+}
+.pos-header {
+    display: flex;
+    justify-content: space-between;
+}
+.post-header a {
+    color: inherit ;
+    text-decoration: none;
+}
+.post-controls a {
+    color: inherit ;
+    text-decoration: none;
+}
+.post-header .avatar {
+    margin-right: 5rem ;
+}
+.post-header time {
+    font-size: .875rem ;
+}
+
+
+
+
+.avatar {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+}
+
+.avatar[data-initial] {
+   background-color: var(--color-accent);
+    display: inline-flex ;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    color: var(--color-text);
+}
+.avatar[data-initial]::after {
+    content: attr(data-initial);
+}
+
+.post-content{
+    margin: 1rem 0;
+}
+/*.post-form {*/
+/*    display: flex ;*/
+/*    align-items: center;*/
+/*}*/
+/*.post-controls {*/
+/*    color: inherit ;*/
+/*    text-decoration: none;*/
+/*}*/
+
+/*.post-form > * + * {*/
+/*    display: flex;*/
+/*    align-items: center;*/
+/*}*/
+
+
+.post-controls > * + * {
+    margin-left: 1rem;
+}
+
+.like-button::after {
+    content: ' 🖤';
+}
+
+.comments-link::after {
+    content: ' 💬';
+}
+
+

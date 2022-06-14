@@ -86,7 +86,7 @@ Content-Type: application/json
 
 
 #### GET ALL POSTS
-GET {{local}}/api/users/youssef/posts?last=&before=
+GET {{local}}/api/users/youssef/posts?last=&before=770560339577405441
 Authorization: {{user-token}}
 
 
@@ -110,7 +110,7 @@ Authorization: {{user-token}}
 
 
 #### GET LIST TIMELINE OF AUTH USER ENDPOINT
-GET {{local}}/api/timeline?last=&before=
+GET {{local}}/api/timeline?last=&before=770558387707281409
 Authorization: {{user-token}}
 
 

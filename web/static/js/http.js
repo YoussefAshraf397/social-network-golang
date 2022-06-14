@@ -4,7 +4,7 @@ import {isObject} from "./utils.js";
 
 export function doGet(url, headers) {
   return fetch (url, {
-    headers: object.assign(defaultHeaders(), headers),
+    headers: Object.assign(defaultHeaders(), headers),
   }).then(parseResponse)
 
 }
@@ -20,56 +20,6 @@ export function doPost(url, body , headers) {
     init.headers['content-type'] = "application/json; charset=utf-8"
   }
   Object.assign(init.headers , headers)
-
-  // return fetch('http://localhost:3000/api/login', {
-  //   method: 'POST',
-  //   headers: {
-  //     'content-type': 'application/json',
-  //   },
-  //   body: {
-  //     email: 'Royoussef@youssef.com'
-  //   }
-  // }).then(response => {
-  //       console.log(response)
-  //     })
-  //     .catch(err => {
-  //       console.log(err)
-  //     })
-
-      // const urls = "http://localhost:3000/api/login"
-      // let postObj = {
-      //   email: "youssef@youssef.com"
-      // }
-     // let post = JSON.stringify(postObj)
-
-  // let xhr = new XMLHttpRequest()
-  // xhr.open('POST', url, true)
-  // // console.log(init)
-  // xhr.setRequestHeader('Content-type', 'application/json; charset=UTF-8')
-  // xhr.send(init['body']);
-  //
-  // let test;
-  // xhr.onload = function () {
-  //   test =   xhr.response
-  //   body = parseJSON( test)
-  //   if(xhr.status === 200) {
-  //     console.log( body.token)
-  //
-  //     console.log("Post successfully created!")
-  //     return body
-  //   }
-  // }
-  //
-  // return xhr.responseText
-// return  fetch(url, init).then(function(response){
-//   return response.json()})
-    // .then(function(data)
-    // {console.log(data)})
-  // return fetch(url, {
-  //   Method: 'POST',
-  //   Headers: {'Content-type': 'application/json; charset=UTF-8'} ,
-  //   Body:  init['body']
-  // }).then(parseResponse)
   return fetch(url, init).then(parseResponse)
 
 }
@@ -83,10 +33,13 @@ function defaultHeaders() {
 
 async function parseResponse(res) {
   const body = parseJSON(await res.text())
+  console.log("ssddsdsdsds")
   return body
   if(!res.ok) {
+    console.log("ssddsdsdsds")
     const msg = String(body)
     const err = new Error(msg)
+    console.log(err)
     err.name = msg.toLocaleLowerCase().split(' ').map(word => {
       return word.charAt(0).toUpperCase() + word.slice(1)
     }).join('')+ 'Error'

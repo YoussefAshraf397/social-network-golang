@@ -39,11 +39,13 @@
  * @prop {boolean} NSFW
  * @prop {string=} spoilerOf
  * @prop {ReactionCount[]} reactions
- * @prop {number} commentsCount
+ * @prop {number} CommentsCount
+ * @prop {number} likesCount
  * @prop {string[]} mediaURLs
  * @prop {string|Date} createdAt
  * @prop {User=} user
  * @prop {boolean} mine
+ * @prop {Post} post
  * @prop {boolean} liked
  * @prop {boolean} subscribed
  */

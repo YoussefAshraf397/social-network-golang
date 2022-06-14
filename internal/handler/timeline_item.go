@@ -1,22 +1,22 @@
 package handler
 
 import (
-	"mime"
 	"net/http"
 	"social-network/internal/service"
 	"strconv"
 )
 
 func (h *handler) timeline(w http.ResponseWriter, r *http.Request) {
-	if a, _, err := mime.ParseMediaType(r.Header.Get("Accept")); err == nil && a == "text/stream" {
-		h.subscribedToTimeline(w, r)
-		return
-	}
+	//if a, _, err := mime.ParseMediaType(r.Header.Get("Accept")); err == nil && a == "text/stream" {
+	//	h.subscribedToTimeline(w, r)
+	//	return
+	//}
 
 	ctx := r.Context()
 	q := r.URL.Query()
 	last, _ := strconv.Atoi(q.Get("last"))
 	before, _ := strconv.ParseInt(q.Get("before"), 10, 64)
+	//log.Fatalln(before)
 	tt, err := h.Timeline(ctx, last, before)
 	if err == service.ErrUnauthenticated {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
