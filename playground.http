@@ -11,10 +11,10 @@ Content-Type: application/json
 
 #### LOGIN USER ENDPOINT
 POST {{local}}/api/login
-Content-Type: application/json
+Content-Type: application/json; charset=utf-8
 
 {
-  "email" : "mamdouh@mamdouh.com"
+  "email" : "youssef@youssef.com"
 }
 
 
