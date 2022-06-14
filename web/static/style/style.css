@@ -1,3 +1,26 @@
+:root {
+    --color-bg-root: black;
+    --color-bg-controls: rgb(24,22,26);
+    --color-text: white;
+    --color-accent: #600b9f
+}
+
 body {
+    background-color: var(--color-bg-root);
+    color: var(--color-text);
     font-family: sans-serif;
+}
+
+button,
+input {
+    background-color: var( --color-bg-controls);
+    border: none;
+    color: inherit;
+    padding: 0 1rem;
+    height: 2rem;
+    border-radius: .25rem;
+}
+
+a{
+    color: var(--color-accent);
 }

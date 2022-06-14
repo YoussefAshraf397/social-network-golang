@@ -23,7 +23,8 @@
  * @typedef DevLoginOutput
  * @prop {string} token
  * @prop {string|Date} expiresAt
- * @prop {User} user
+ * @prop {User} authUser
+ * @prop {User} authUser
  */
 
 /**

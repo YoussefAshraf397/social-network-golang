@@ -61,15 +61,16 @@ export function doPost(url, body , headers) {
   // }
   //
   // return xhr.responseText
-  return fetch(url, init).then(parseResponse => {
-    console.log("sdscds" , parseResponse.token)
-  })
+// return  fetch(url, init).then(function(response){
+//   return response.json()})
+    // .then(function(data)
+    // {console.log(data)})
   // return fetch(url, {
   //   Method: 'POST',
   //   Headers: {'Content-type': 'application/json; charset=UTF-8'} ,
   //   Body:  init['body']
   // }).then(parseResponse)
-  // return fetch(url, init).then(parseResponse)
+  return fetch(url, init).then(parseResponse)
 
 }
 
@@ -82,6 +83,7 @@ function defaultHeaders() {
 
 async function parseResponse(res) {
   const body = parseJSON(await res.text())
+  return body
   if(!res.ok) {
     const msg = String(body)
     const err = new Error(msg)
@@ -91,6 +93,7 @@ async function parseResponse(res) {
     err['statusCode'] = err.status
     err['statusText'] = err.statusText
     err['url'] = err.url
+    console.log(err)
     throw err
   }
 }

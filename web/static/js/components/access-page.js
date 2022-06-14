@@ -27,21 +27,19 @@ async function onLoginFormSubmit(ev) {
     const input = form.querySelector('input')
     const button = form.querySelector('button')
     const email = input.value
-    console.log(email)
+    let response
 
     input.disabled = true
     button.disabled = true
 
     try{
-        const out = await  http.login(email)
-
-        // console.log("in access-page: " , http.login(email))
+        const out = await http.login(email)
 
         localStorage.setItem('token' , out.token)
         localStorage.setItem('expires_at' , typeof out.expiresAt === 'string'
             ? out.expiresAt
             : out.expiresAt.toJSON())
-        localStorage.setItem('auth_user', stringifyJSON(out.user))
+        localStorage.setItem('auth_user', stringifyJSON(out.authUser))
         location.reload()
     } catch (err) {
       console.error(err)
